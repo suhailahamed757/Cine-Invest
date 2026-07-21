@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineInvest Core — Institutional Film Equity Platform</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #09090b;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #18181b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+
+        /* Custom glow effects */
+        .glow-amber {
+            box-shadow: 0 0 20px -5px rgba(245, 158, 11, 0.15);
+        }
+
+        .glow-emerald {
+            box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.15);
+        }
+    </style>
+</head>
+
+<body class="text-zinc-100 min-h-screen flex flex-col antialiased bg-zinc-950">
+
+    <!-- Premium Master Navigation Header -->
+    <header class="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div
+                    class="h-9 w-9 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-900/20">
+                    <i data-lucide="clapperboard" class="h-5 w-5 text-zinc-950 stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <span
+                        class="font-display font-bold text-xl tracking-tight bg-gradient-to-r from-zinc-50 via-zinc-200 to-zinc-400 bg-clip-text text-transparent">CineInvest
+                        <span class="text-amber-500">Core</span></span>
+                    <span
+                        class="text-[10px] block font-medium tracking-widest uppercase text-zinc-500 font-mono">Institutional
+                        Gateway</span>
+                </div>
+            </div>
+
+            <!-- Master View Navigation Hub -->
+            <nav
+                class="flex flex-wrap bg-zinc-900 border border-zinc-800 p-1 rounded-xl shadow-inner justify-center gap-1">
+                <button onclick="switchTab('marketplace')" id="tab-btn-marketplace"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 flex items-center gap-2 bg-amber-500 text-zinc-950 shadow-md">
+                    <i data-lucide="layers" class="h-4 w-4"></i> Film Equity Marketplace
+                </button>
+                <button onclick="switchTab('fees')" id="tab-btn-fees"
+                    class="px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 flex items-center gap-2 text-zinc-400 hover:text-zinc-200">
+                    <i data-lucide="receipt" class="h-4 w-4"></i> Fee Schedule
+                </button>
+                <button onclick="switchTab('treasury')" id="tab-btn-treasury"
+                    class="px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 flex items-center gap-2 text-zinc-400 hover:text-zinc-200">
+                    <i data-lucide="landmark" class="h-4 w-4"></i> Treasury & Matrix
+                </button>
+            </nav>
+
+            <div class="hidden lg:flex items-center gap-4">
+                <div
+                    class="flex items-center gap-2 bg-zinc-900/50 border border-zinc-800 px-3 py-1.5 rounded-lg text-xs font-mono">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-zinc-400 font-medium">Node: Mainnet-IN</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Application Screen Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-8">
+
+        <!-- SECTION 1: FILM EQUITY MARKETPLACE TAB -->
+        <div id="tab-content-marketplace" class="space-y-6 block">
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-2 border-amber-500 pl-4 py-1">
+                <div>
+                    <h1 class="font-display text-2xl font-bold tracking-tight text-zinc-50">Active Asset Offerings</h1>
+                    <p class="text-sm text-zinc-400">Institutional-grade fractionalized film production stakes open for
+                        placement.</p>
+                </div>
+                <div class="bg-zinc-900/80 border border-zinc-800 rounded-xl px-4 py-2 flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase font-mono tracking-wider text-zinc-500 block">Available
+                            Capital</span>
+                        <span class="font-mono text-zinc-200 font-bold" id="header-wallet-balance">₹1,50,00,000</span>
+                    </div>
+                    <button onclick="resetWallet()"
+                        class="p-1.5 hover:bg-zinc-800 text-zinc-400 hover:text-amber-500 rounded-lg transition-colors"
+                        title="Reset Sandbox Capital">
+                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Asset Cards Grid (Populated dynamically) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="assets-grid-container">
+                <!-- Cards injected here via app engine -->
+            </div>
+
+            <!-- Sub-Section: User Portfolio Ledger -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-6 mt-12">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-zinc-100 flex items-center gap-2">
+                            <i data-lucide="wallet" class="h-5 w-5 text-amber-500"></i> My Active Placement Portfolio
+                        </h3>
+                        <p class="text-xs text-zinc-400">Ledger details of your currently committed film project stakes.
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="bg-zinc-900/60 border border-zinc-800 px-3 py-1.5 rounded-lg text-center">
+                            <span class="text-[9px] uppercase font-mono text-zinc-500 block">Total Invested</span>
+                            <span class="text-sm font-bold font-mono text-zinc-200"
+                                id="portfolio-total-invested">₹0</span>
+                        </div>
+                        <div class="bg-zinc-900/60 border border-zinc-800 px-3 py-1.5 rounded-lg text-center">
+                            <span class="text-[9px] uppercase font-mono text-zinc-500 block">Est. Return Yield</span>
+                            <span class="text-sm font-bold font-mono text-amber-400 animate-pulse"
+                                id="portfolio-total-yield">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-left text-xs text-zinc-400 border-collapse">
+                        <thead>
+                            <tr
+                                class="border-b border-zinc-800 text-[10px] uppercase font-mono tracking-wider text-zinc-500">
+                                <th class="py-3 px-4 font-semibold">Project</th>
+                                <th class="py-3 px-4 font-semibold">Asset Code</th>
+                                <th class="py-3 px-4 font-semibold text-right">Committed Capital</th>
+                                <th class="py-3 px-4 font-semibold text-right">Simulator Multiplier</th>
+                                <th class="py-3 px-4 font-semibold text-right">Est. Pre-Tax Return</th>
+                                <th class="py-3 px-4 font-semibold text-center">Ledger Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolio-table-body">
+                            <!-- Injected portfolio rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: DYNAMIC FEE SCHEDULE TAB -->
+        <div id="tab-content-fees" class="space-y-6 hidden">
+            <div class="border-l-2 border-amber-500 pl-4 py-1">
+                <h1 class="font-display text-2xl font-bold tracking-tight text-zinc-50">Platform Fee Architecture</h1>
+                <p class="text-sm text-zinc-400">Transparent asymmetric fee structures tailored to project asset
+                    performance thresholds.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Profit Matrix Card -->
+                <div
+                    class="bg-zinc-950 border border-emerald-500/20 rounded-2xl p-6 space-y-4 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 h-24 w-24 bg-emerald-500/5 rounded-bl-full pointer-events-none">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="h-9 w-9 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center justify-center text-emerald-400">
+                            <i data-lucide="trending-up" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-lg font-bold text-zinc-100">Profitable Settlement Matrix</h3>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-500">Yield >
+                                Principal</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-zinc-400">Standard institutional allocation processing applied to positive
+                        commercial return settlements.</p>
+
+                    <div class="space-y-2 pt-2 text-xs font-mono">
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">Fundraising & Platform Fee</span>
+                            <span class="text-zinc-200 font-bold">7.0%</span>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">GST (Government Levies)</span>
+                            <span class="text-zinc-200 font-bold">2.0%</span>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">Secure Transaction Fee</span>
+                            <span class="text-zinc-200 font-bold">0.5%</span>
+                        </div>
+                        <div class="flex justify-between pt-2 text-sm text-emerald-400 font-semibold">
+                            <span>Aggregate Operational Friction</span>
+                            <span>9.5%</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-[11px] text-zinc-400 flex justify-between items-center">
+                        <span>Example: Invest ₹1,00,000 ➔ Return ₹2,00,000</span>
+                        <span class="font-mono text-zinc-300 font-medium">Total Fees: ₹19,000</span>
+                    </div>
+                </div>
+
+                <!-- Loss Cushion Matrix Card -->
+                <div class="bg-zinc-950 border border-rose-500/20 rounded-2xl p-6 space-y-4 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 h-24 w-24 bg-rose-500/5 rounded-bl-full pointer-events-none">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="h-9 w-9 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400">
+                            <i data-lucide="trending-down" class="h-5 w-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-lg font-bold text-zinc-100">Downside Cushion Matrix</h3>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-rose-500">Yield &le;
+                                Principal</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-zinc-400">Reduced platform fees to mitigate downside risk exposures on
+                        distressed assets.</p>
+
+                    <div class="space-y-2 pt-2 text-xs font-mono">
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">Fundraising & Platform Fee</span>
+                            <span class="text-zinc-200 font-bold">2.0%</span>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">GST (Government Levies)</span>
+                            <span class="text-zinc-200 font-bold">2.0%</span>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900 pb-2">
+                            <span class="text-zinc-500">Secure Transaction Fee</span>
+                            <span class="text-zinc-200 font-bold">0.5%</span>
+                        </div>
+                        <div class="flex justify-between pt-2 text-sm text-rose-400 font-semibold">
+                            <span>Aggregate Operational Friction</span>
+                            <span>4.5%</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-[11px] text-zinc-400 flex justify-between items-center">
+                        <span>Example: Invest ₹1,00,000 ➔ Return ₹95,000</span>
+                        <span class="font-mono text-zinc-300 font-medium">Total Fees: ₹4,275</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Core Hyperlink CTA Banner -->
+            <div
+                class="bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-500/20 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="space-y-1">
+                    <h4 class="font-display font-bold text-zinc-200">Test Live Asymmetric Configurations</h4>
+                    <p class="text-xs text-zinc-400">Simulate custom capital sums under variable return scales inside
+                        our sandbox environment.</p>
+                </div>
+                <button onclick="switchTab('treasury')"
+                    class="bg-amber-500 text-zinc-950 font-bold text-xs px-5 py-2.5 rounded-lg transition-all hover:bg-amber-600 shadow-lg shadow-amber-500/10 cursor-pointer">
+                    Launch Simulator Core
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 3: PLATFORM TREASURY & PERFORMANCE MATRIX TAB -->
+        <div id="tab-content-treasury" class="space-y-6 hidden">
+            <div class="border-l-2 border-amber-500 pl-4 py-1">
+                <h1 class="font-display text-2xl font-bold tracking-tight text-zinc-50">Treasury Telemetry & Simulation
+                    Matrix</h1>
+                <p class="text-sm text-zinc-400">Real-time analytical interface tracking network deployment, asset
+                    liquidity metrics, and commercial models.</p>
+            </div>
+
+            <!-- Platform Treasury Telemetry Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-zinc-500">
+                        <span class="text-xs font-medium uppercase tracking-wider">Gross Platform Treasury</span>
+                        <i data-lucide="vault" class="h-4 w-4 text-amber-500"></i>
+                    </div>
+                    <div class="font-display text-2xl font-bold tracking-tight text-zinc-50" id="stat-gross-treasury">
+                        ₹14,84,50,000</div>
+                    <span
+                        class="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded flex items-center gap-1 w-max">
+                        <i data-lucide="trending-up" class="h-2.5 w-2.5"></i> +14.2% QoQ
+                    </span>
+                </div>
+
+                <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-zinc-500">
+                        <span class="text-xs font-medium uppercase tracking-wider">Aggregate Fund Intake</span>
+                        <i data-lucide="wallet" class="h-4 w-4 text-amber-500"></i>
+                    </div>
+                    <div class="font-display text-2xl font-bold tracking-tight text-zinc-50" id="stat-fund-intake">
+                        ₹5,92,10,500</div>
+                    <span
+                        class="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded flex items-center gap-1 w-max">
+                        <i data-lucide="trending-up" class="h-2.5 w-2.5"></i> Active Quarter
+                    </span>
+                </div>
+
+                <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-zinc-500">
+                        <span class="text-xs font-medium uppercase tracking-wider">Processing Yield</span>
+                        <i data-lucide="percent" class="h-4 w-4 text-amber-500"></i>
+                    </div>
+                    <div class="font-display text-2xl font-bold tracking-tight text-zinc-50">3.84%</div>
+                    <span class="text-[10px] font-mono text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded w-max block">Net
+                        Margin Spread</span>
+                </div>
+
+                <div class="bg-zinc-950 border border-zinc-800 p-5 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-zinc-500">
+                        <span class="text-xs font-medium uppercase tracking-wider">Premium Data Services</span>
+                        <i data-lucide="bar-chart-3" class="h-4 w-4 text-amber-500"></i>
+                    </div>
+                    <div class="font-display text-2xl font-bold tracking-tight text-zinc-50">₹12,50,000</div>
+                    <span
+                        class="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded w-max block">Institutional
+                        Subscriptions</span>
+                </div>
+            </div>
+
+            <!-- Chart.js Monthly Platform Pipelines -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-zinc-100">Historical Treasury Pipeline Flow</h3>
+                        <p class="text-xs text-zinc-400">Monthly breakdown of capital entry vs processing margin
+                            collections.</p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-mono">
+                        <div class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Fund Intake</div>
+                        <div class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-zinc-600"></span>
+                            Service Margins</div>
+                    </div>
+                </div>
+                <div class="relative w-full h-[240px]">
+                    <canvas id="pipelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Investment Performance Matrix Engine Block -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-zinc-100 flex items-center gap-2">
+                            <i data-lucide="cpu" class="h-5 w-5 text-amber-500"></i> Performance Simulation Matrix
+                            Engine
+                        </h3>
+                        <p class="text-xs text-zinc-400">Model post-tax corporate capital yields with automated
+                            asymmetric operational fee adaptation.</p>
+                    </div>
+                    <div id="fee-state-badge"
+                        class="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 w-max">
+                        Fee Engine Status: Profitable Matrix Active (7% + 2% + 0.5%)
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Controls Panel -->
+                    <div class="lg:col-span-5 space-y-5 bg-zinc-900/40 border border-zinc-800 p-5 rounded-xl">
+                        <h4
+                            class="text-xs font-mono font-bold tracking-wider text-zinc-400 uppercase border-b border-zinc-800 pb-2">
+                            Simulation Parameters</h4>
+
+                        <!-- Input 1 -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-semibold text-zinc-300 flex justify-between">
+                                <span>Principal Equity Allocation</span>
+                                <span class="font-mono text-amber-500">INR</span>
+                            </label>
+                            <input id="param-principal" oninput="runSimulationEngine()" type="number" value="100000"
+                                class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm font-mono text-zinc-200 focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <!-- Input 2 -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs font-semibold text-zinc-300">
+                                <span>Box Office Return Multiplier</span>
+                                <span id="val-multiplier" class="font-mono text-amber-500 font-bold">2.50x</span>
+                            </div>
+                            <input id="param-multiplier" oninput="runSimulationEngine()" type="range" min="0" max="6"
+                                step="0.05" value="2.5" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Computations Display Panel -->
+                    <div
+                        class="lg:col-span-7 flex flex-col justify-between border border-zinc-800 p-5 rounded-xl relative overflow-hidden bg-zinc-950">
+                        <div
+                            class="absolute inset-0 bg-radial from-amber-500/5 via-transparent to-transparent opacity-50 pointer-events-none">
+                        </div>
+
+                        <div class="flex justify-between items-center border-b border-zinc-800/60 pb-3 z-10">
+                            <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Dynamic Matrix
+                                Calculations</span>
+                            <span id="badge-classification"
+                                class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">High
+                                Yield (Hit)</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-y-4 gap-x-6 py-4 z-10">
+                            <div>
+                                <span class="text-[11px] text-zinc-500 block uppercase font-medium">Fundraising &
+                                    Platform Fee</span>
+                                <span id="calc-fund-fee"
+                                    class="font-mono text-sm font-semibold text-zinc-300">₹7,000</span>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-zinc-500 block uppercase font-medium">GST Amount
+                                    (2%)</span>
+                                <span id="calc-gst" class="font-mono text-sm font-semibold text-zinc-300">₹2,000</span>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-zinc-500 block uppercase font-medium">Transaction Gate Fee
+                                    (0.5%)</span>
+                                <span id="calc-gate" class="font-mono text-sm font-semibold text-zinc-300">₹500</span>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-zinc-500 block uppercase font-medium">Gross Return
+                                    Pipeline</span>
+                                <span id="calc-gross-yield"
+                                    class="font-mono text-sm font-semibold text-zinc-200">₹2,50,000</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-zinc-900 border border-zinc-800/80 p-4 rounded-xl flex items-center justify-between mt-auto z-10">
+                            <div>
+                                <span class="text-xs text-zinc-400 block font-medium">Final Net Settlement</span>
+                                <span id="calc-settlement"
+                                    class="font-display text-2xl font-bold text-zinc-50 tracking-tight">₹2,37,500</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-zinc-400 block font-medium">Net Realized ROI</span>
+                                <span id="calc-roi" class="font-mono text-xl font-bold text-emerald-400">+137.50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Institutional Allocation Gateway Confirmation Modal Overlay -->
+    <div id="allocation-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm px-4 hidden">
+        <div class="bg-zinc-900 border border-zinc-800 max-w-md w-full rounded-2xl overflow-hidden shadow-2xl transition-all scale-95 opacity-0 duration-200"
+            id="modal-container">
+            <div class="p-6 space-y-4">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                            <i data-lucide="shield-check" class="h-4 w-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-zinc-100" id="modal-asset-name">Asset Allocation</h3>
+                            <span class="text-[10px] text-zinc-400 font-mono tracking-wider block">CAPITAL SUITABILITY
+                                ASSURED</span>
+                        </div>
+                    </div>
+                    <button onclick="closeAllocationModal()" class="text-zinc-500 hover:text-zinc-300 cursor-pointer">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+
+                <hr class="border-zinc-800">
+
+                <div class="space-y-4">
+                    <p class="text-xs text-zinc-400 leading-relaxed">Specify the capital sum you wish to allocate for
+                        ledger reservation on this premium project.</p>
+
+                    <!-- Investment Capital Field Group -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-zinc-300 flex justify-between">
+                            <span>Your Investment Sum (₹)</span>
+                            <span class="text-zinc-500 font-mono" id="modal-min-placement-text">Min: -</span>
+                        </label>
+                        <input id="modal-investment-input" oninput="calculateModalProjections()" type="number"
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm font-mono text-zinc-200 focus:outline-none focus:border-amber-500"
+                            placeholder="Enter amount to invest">
+                        <span id="modal-error-message" class="text-[10px] text-rose-500 font-medium block h-4"></span>
+                    </div>
+
+                    <!-- Dynamic Return Calculation Matrix inside Modal -->
+                    <div class="bg-zinc-950 rounded-xl p-4 border border-zinc-800 space-y-2.5">
+                        <div class="flex justify-between text-xs text-zinc-400 font-mono">
+                            <span>Simulator Multiplier</span>
+                            <span class="text-zinc-300 font-semibold" id="modal-projected-multiplier">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-zinc-400 font-mono">
+                            <span>Projected Return (Pre-Tax)</span>
+                            <span class="text-amber-400 font-bold" id="modal-projected-return">₹0</span>
+                        </div>
+                        <hr class="border-zinc-900">
+                        <div class="flex justify-between text-xs text-zinc-400 font-mono">
+                            <span>Liquid Cap Space Space Left</span>
+                            <span class="text-zinc-300 font-semibold" id="modal-asset-left">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeAllocationModal()"
+                        class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-xs py-2.5 rounded-lg transition-all cursor-pointer">
+                        Abstain Entry
+                    </button>
+                    <button id="modal-commit-btn" onclick="commitDynamicInvestment()"
+                        class="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs py-2.5 rounded-lg transition-all shadow-md shadow-amber-500/10 cursor-pointer">
+                        Commit Allocation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Floating Toast Container -->
+    <div id="toast-container"
+        class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Master Corporate Footer Layer -->
+    <footer
+        class="mt-auto border-t border-zinc-900 bg-zinc-950 px-6 py-6 text-center text-xs text-zinc-500 font-medium">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
+            <span>© 2026 CineInvest Platforms Private Limited. All institutional claims reserved.</span>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-zinc-300 transition-colors">Risk Mandate Ledger</a>
+                <a href="#" class="hover:text-zinc-300 transition-colors">Regulatory Framework</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Logic Script Engine Block -->
+    <script>
+        // Reactive movie data state with stable high-impact cinema posters
+        let MOVIES = [
+            {
+                id: 'phx-01',
+                code: 'PHX-01',
+                name: 'Project Phoenix',
+                image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=600&auto=format&fit=crop',
+                status: 'Pre-Production',
+                statusClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                description: 'High-octane action thriller backed by an aggregate Pan-Indian ensemble cast with distribution locking arrays.',
+                totalBudget: 100000000, // ₹10.00 Cr
+                publicCap: 10000000,    // ₹1.00 Cr
+                bookedPercent: 65,
+                bookedAmount: 6500000,
+                minPlacement: 50000,
+                colorFrom: 'from-amber-500',
+                colorTo: 'to-orange-500',
+                textColor: 'text-amber-500',
+            },
+            {
+                id: 'dhr-04',
+                code: 'DHR-04',
+                name: 'Dhuran',
+                image: 'https://images.unsplash.com/photo-1535016120720-40c646be5580?q=80&w=600&auto=format&fit=crop',
+                status: 'Principal Photography',
+                statusClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                description: 'Magnum opus historical drama leveraging ground-up virtual production setups and premium streaming buyouts.',
+                totalBudget: 450000000, // ₹45.00 Cr
+                publicCap: 45000000,    // ₹4.50 Cr
+                bookedPercent: 92,
+                bookedAmount: 41400000,
+                minPlacement: 2000000,
+                colorFrom: 'from-emerald-500',
+                colorTo: 'to-teal-500',
+                textColor: 'text-emerald-500',
+            },
+            {
+                id: 'che-09',
+                code: 'CHE-09',
+                name: 'Chasing Echoes',
+                image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop',
+                status: 'Post-Production',
+                statusClass: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                description: 'Indie psychological drama targeted at premier global film festivals with confirmed domestic theatrical syndication pipelines.',
+                totalBudget: 40000000, // ₹4.00 Cr
+                publicCap: 4000000,    // ₹40.00 Lakhs
+                bookedPercent: 35,
+                bookedAmount: 1400000,
+                minPlacement: 25000,
+                colorFrom: 'from-blue-500',
+                colorTo: 'to-indigo-500',
+                textColor: 'text-blue-500',
+            }
+        ];
+
+        // Active Placement Holdings State
+        let PORTFOLIO = [
+            {
+                movieId: 'phx-01',
+                movieName: 'Project Phoenix',
+                movieCode: 'PHX-01',
+                amountInvested: 500000, // Preloaded dummy investment
+            }
+        ];
+
+        let sandboxWalletBalance = 14500000; // Remaining sandbox cash (₹1.50 Cr initial - ₹5 Lakhs preloaded)
+        let activeSelectedMovieId = null;
+
+        // Custom Dynamic Toast Node Generator
+        function showCustomToast(title, desc, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let badgeBg = 'bg-amber-500/10 border-amber-500/20 text-amber-500';
+            let icon = 'shield-check';
+            if (type === 'error') {
+                badgeBg = 'bg-rose-500/10 border-rose-500/20 text-rose-500';
+                icon = 'alert-triangle';
+            } else if (type === 'info') {
+                badgeBg = 'bg-blue-500/10 border-blue-500/20 text-blue-500';
+                icon = 'info';
+            }
+
+            toast.className = 'bg-zinc-900/90 border border-zinc-800/80 rounded-xl p-4 flex gap-3 shadow-xl backdrop-blur-md translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto';
+            toast.innerHTML = `
+                <div class="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${badgeBg}">
+                    <i data-lucide="${icon}" class="h-4 w-4"></i>
+                </div>
+                <div class="flex-1">
+                    <span class="text-xs font-semibold text-zinc-100 block">${title}</span>
+                    <span class="text-[10px] text-zinc-400 block mt-0.5 leading-relaxed">${desc}</span>
+                </div>
+                <button class="text-zinc-500 hover:text-zinc-300 self-start" onclick="this.parentElement.remove()">
+                    <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Slide up & animate entry
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Initialize state components and icons
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMovies();
+            renderPortfolio();
+            updateTotalMetrics();
+            lucide.createIcons();
+        });
+
+        // Dynamic Movie Rendering Engine
+        function renderMovies() {
+            const grid = document.getElementById('assets-grid-container');
+            grid.innerHTML = '';
+
+            MOVIES.forEach(movie => {
+                const percentage = ((movie.bookedAmount / movie.publicCap) * 100);
+                const isFullyBooked = percentage >= 100;
+
+                const card = document.createElement('div');
+                card.className = "bg-zinc-950 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col hover:border-zinc-700/60 transition-all group glow-amber";
+                card.innerHTML = `
+                    <!-- Movie Cinematic Image Banner -->
+                    <div class="h-44 w-full relative overflow-hidden bg-zinc-900 flex-shrink-0">
+                        <img src="${movie.image}" alt="${movie.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
+                        <div class="absolute bottom-4 left-6 right-6 flex justify-between items-end">
+                            <div>
+                                <span class="text-[10px] font-mono uppercase text-amber-500 bg-zinc-950/80 px-2 py-0.5 rounded-md border border-zinc-800/50 tracking-wider">Asset: ${movie.code}</span>
+                                <h3 class="font-display text-xl font-bold text-zinc-100 mt-1.5 drop-shadow-md">${movie.name}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="${movie.statusClass} text-[11px] font-mono px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold">${movie.status}</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 leading-relaxed">${movie.description}</p>
+                        </div>
+
+                        <div class="space-y-4 pt-2">
+                            <div class="space-y-2 border-t border-zinc-900 pt-3">
+                                <div class="flex justify-between text-xs text-zinc-400">
+                                    <span>Total Budget</span>
+                                    <span class="font-semibold text-zinc-200">₹${(movie.totalBudget / 10000000).toFixed(2)} Cr</span>
+                                </div>
+                                <div class="flex justify-between text-xs text-zinc-400">
+                                    <span>Public Equity Cap</span>
+                                    <span class="font-semibold text-zinc-200">₹${(movie.publicCap >= 10000000) ? (movie.publicCap / 10000000).toFixed(2) + ' Cr' : (movie.publicCap / 100000).toFixed(0) + ' Lakhs'}</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-xs font-medium">
+                                    <span class="text-zinc-400">Booked Allocation</span>
+                                    <span class="${movie.textColor} font-bold">${percentage.toFixed(1)}%</span>
+                                </div>
+                                <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-zinc-800">
+                                    <div class="bg-gradient-to-r ${movie.colorFrom} ${movie.colorTo} h-full rounded-full transition-all duration-500"
+                                        style="width: ${Math.min(100, percentage)}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-zinc-900/40 border-t border-zinc-800/60 flex items-center justify-between flex-shrink-0">
+                        <span class="text-[10px] font-mono text-zinc-500">Min Placement: ₹${movie.minPlacement.toLocaleString('en-IN')}</span>
+                        <button onclick="openAllocationModal('${movie.id}')"
+                            class="bg-zinc-800 hover:bg-amber-500 text-zinc-200 hover:text-zinc-950 font-semibold text-xs px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                            Access Allocation <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Dynamic Active Placement Ledger Render Engine
+        function renderPortfolio() {
+            const tbody = document.getElementById('portfolio-table-body');
+            tbody.innerHTML = '';
+
+            if (PORTFOLIO.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-zinc-500 italic">No committed active placements registered. Select a project above.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const multiplier = parseFloat(document.getElementById('param-multiplier').value) || 1.0;
+
+            PORTFOLIO.forEach((holding, index) => {
+                const projectedReturn = holding.amountInvested * multiplier;
+
+                const row = document.createElement('tr');
+                row.className = "border-b border-zinc-900 hover:bg-zinc-900/20 transition-all font-mono";
+                row.innerHTML = `
+                    <td class="py-4 px-4 font-sans font-bold text-zinc-200">${holding.movieName}</td>
+                    <td class="py-4 px-4 text-zinc-500">${holding.movieCode}</td>
+                    <td class="py-4 px-4 text-right text-zinc-300">₹${holding.amountInvested.toLocaleString('en-IN')}</td>
+                    <td class="py-4 px-4 text-right text-zinc-400">${multiplier.toFixed(2)}x</td>
+                    <td class="py-4 px-4 text-right text-amber-500 font-bold">₹${projectedReturn.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                    <td class="py-4 px-4 text-center">
+                        <button onclick="liquidateStake(${index})" class="text-zinc-500 hover:text-rose-400 transition-colors p-1" title="Liquidate Stake">
+                            <i data-lucide="trash-2" class="h-4 w-4 mx-auto"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        // Update Wallet metrics, Treasury Gross counts, and totals
+        function updateTotalMetrics() {
+            document.getElementById('header-wallet-balance').innerText = '₹' + sandboxWalletBalance.toLocaleString('en-IN');
+
+            let totalInvested = 0;
+            PORTFOLIO.forEach(h => totalInvested += h.amountInvested);
+            document.getElementById('portfolio-total-invested').innerText = '₹' + totalInvested.toLocaleString('en-IN');
+
+            const multiplier = parseFloat(document.getElementById('param-multiplier').value) || 1.0;
+            const totalYield = totalInvested * multiplier;
+            document.getElementById('portfolio-total-yield').innerText = '₹' + totalYield.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+            // Sync matrix counts
+            const baseTreasury = 148450000;
+            const baseIntake = 59210500;
+            document.getElementById('stat-gross-treasury').innerText = '₹' + (baseTreasury + totalInvested).toLocaleString('en-IN');
+            document.getElementById('stat-fund-intake').innerText = '₹' + (baseIntake + totalInvested).toLocaleString('en-IN');
+        }
+
+        // Reset Sandbox Balance Trigger
+        function resetWallet() {
+            sandboxWalletBalance = 15000000;
+            PORTFOLIO = [];
+
+            // Restore default booked metrics
+            MOVIES[0].bookedAmount = 6500000;
+            MOVIES[1].bookedAmount = 41400000;
+            MOVIES[2].bookedAmount = 1400000;
+
+            renderMovies();
+            renderPortfolio();
+            updateTotalMetrics();
+            showCustomToast('Ledger Reset Complete', 'Sandbox capital restored to ₹1,50,00,000.', 'info');
+        }
+
+        // Investment Liquidation Handler
+        function liquidateStake(index) {
+            const holding = PORTFOLIO[index];
+            const matchingMovie = MOVIES.find(m => m.id === holding.movieId);
+
+            if (matchingMovie) {
+                matchingMovie.bookedAmount = Math.max(0, matchingMovie.bookedAmount - holding.amountInvested);
+            }
+
+            sandboxWalletBalance += holding.amountInvested;
+            PORTFOLIO.splice(index, 1);
+
+            renderMovies();
+            renderPortfolio();
+            updateTotalMetrics();
+            showCustomToast('Allocation Liquidated', `Stake of ₹${holding.amountInvested.toLocaleString('en-IN')} returned to wallet.`, 'info');
+        }
+
+        // Investment Modal Gateway Configuration Handler
+        function openAllocationModal(movieId) {
+            activeSelectedMovieId = movieId;
+            const movie = MOVIES.find(m => m.id === movieId);
+            if (!movie) return;
+
+            document.getElementById('modal-asset-name').innerText = movie.name;
+            document.getElementById('modal-min-placement-text').innerText = 'Min Placement: ₹' + movie.minPlacement.toLocaleString('en-IN');
+
+            const capLeft = movie.publicCap - movie.bookedAmount;
+            document.getElementById('modal-asset-left').innerText = '₹' + capLeft.toLocaleString('en-IN');
+
+            // Pre-fill input with min investment
+            const input = document.getElementById('modal-investment-input');
+            input.value = movie.minPlacement;
+            input.min = movie.minPlacement;
+            input.max = capLeft;
+
+            calculateModalProjections();
+
+            const modal = document.getElementById('allocation-modal');
+            const container = document.getElementById('modal-container');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAllocationModal() {
+            const container = document.getElementById('modal-container');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                document.getElementById('allocation-modal').classList.add('hidden');
+            }, 200);
+        }
+
+        // Modal Calculation Core
+        function calculateModalProjections() {
+            const inputVal = parseFloat(document.getElementById('modal-investment-input').value) || 0;
+            const errorLabel = document.getElementById('modal-error-message');
+            const commitBtn = document.getElementById('modal-commit-btn');
+            const multiplier = parseFloat(document.getElementById('param-multiplier').value) || 1.0;
+
+            const movie = MOVIES.find(m => m.id === activeSelectedMovieId);
+            if (!movie) return;
+
+            const capLeft = movie.publicCap - movie.bookedAmount;
+
+            document.getElementById('modal-projected-multiplier').innerText = multiplier.toFixed(2) + 'x';
+            document.getElementById('modal-projected-return').innerText = '₹' + (inputVal * multiplier).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+            let errorMessage = "";
+            if (inputVal < movie.minPlacement) {
+                errorMessage = `Below minimum placement requirement of ₹${movie.minPlacement.toLocaleString('en-IN')}`;
+            } else if (inputVal > capLeft) {
+                errorMessage = `Above maximum pool allocation capacity of ₹${capLeft.toLocaleString('en-IN')}`;
+            } else if (inputVal > sandboxWalletBalance) {
+                errorMessage = `Insufficient sandbox capital (Balance: ₹${sandboxWalletBalance.toLocaleString('en-IN')})`;
+            }
+
+            if (errorMessage) {
+                errorLabel.innerText = errorMessage;
+                commitBtn.disabled = true;
+            } else {
+                errorLabel.innerText = "";
+                commitBtn.disabled = false;
+            }
+        }
+
+        // Commit placement allocation trigger
+        function commitDynamicInvestment() {
+            const inputVal = parseFloat(document.getElementById('modal-investment-input').value) || 0;
+            const movie = MOVIES.find(m => m.id === activeSelectedMovieId);
+            if (!movie) return;
+
+            // Update local movie bookings
+            movie.bookedAmount += inputVal;
+            sandboxWalletBalance -= inputVal;
+
+            // Push to portfolio placement holding
+            const existingHolding = PORTFOLIO.find(h => h.movieId === movie.id);
+            if (existingHolding) {
+                existingHolding.amountInvested += inputVal;
+            } else {
+                PORTFOLIO.push({
+                    movieId: movie.id,
+                    movieName: movie.name,
+                    movieCode: movie.code,
+                    amountInvested: inputVal
+                });
+            }
+
+            // Clean UI metrics
+            renderMovies();
+            renderPortfolio();
+            updateTotalMetrics();
+            closeAllocationModal();
+
+            showCustomToast(
+                'Allocation Committed',
+                `Secured ₹${inputVal.toLocaleString('en-IN')} stake on ${movie.name}. Private allocation index generated.`,
+                'success'
+            );
+        }
+
+        // Screen Tab Matrix Management
+        function switchTab(tabId) {
+            const tabs = ['marketplace', 'fees', 'treasury'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-content-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    el.classList.add('block');
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-semibold tracking-wide transition-all duration-200 flex items-center gap-2 bg-amber-500 text-zinc-950 shadow-md";
+                } else {
+                    el.classList.remove('block');
+                    el.classList.add('hidden');
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 flex items-center gap-2 text-zinc-400 hover:text-zinc-200";
+                }
+            });
+
+            if (tabId === 'treasury') {
+                setTimeout(initializeChart, 50);
+                runSimulationEngine();
+            } else if (tabId === 'marketplace') {
+                renderPortfolio();
+                updateTotalMetrics();
+            }
+        }
+
+        // Global Chart Instance Configuration
+        let chartInstance = null;
+        function initializeChart() {
+            const ctx = document.getElementById('pipelineChart');
+            if (!ctx) return;
+            if (chartInstance) return;
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Fund Intake',
+                            data: [8200000, 11400000, 9500000, 14200000, 18900000, 23400000],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.04)',
+                            borderWidth: 2,
+                            tension: 0.35,
+                            fill: true
+                        },
+                        {
+                            label: 'Service Margins',
+                            data: [410000, 680000, 520000, 790000, 920000, 1250000],
+                            borderColor: '#52525b',
+                            borderWidth: 1.5,
+                            borderDash: [4, 4],
+                            tension: 0.3,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(63, 63, 70, 0.15)' },
+                            ticks: {
+                                color: '#71717a',
+                                font: { size: 9, family: 'monospace' },
+                                callback: val => '₹' + (val / 100000).toFixed(0) + 'L'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#71717a', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Adaptive Investment Performance Matrix Simulation Engine
+        function runSimulationEngine() {
+            const principal = parseFloat(document.getElementById('param-principal').value) || 0;
+            const multiplier = parseFloat(document.getElementById('param-multiplier').value);
+
+            // Sync slider value visual text readout
+            document.getElementById('val-multiplier').innerText = multiplier.toFixed(2) + 'x';
+
+            // Calculate Raw Gross Return pipeline from box office multiplier scalar
+            const rawGrossReturn = principal * multiplier;
+
+            // Determine asymmetric execution configuration state based on baseline profit margins
+            let platformFeePct = 0;
+            let gstPct = 2.0;
+            let transactionFeePct = 0.5;
+
+            const badgeState = document.getElementById('fee-state-badge');
+
+            if (rawGrossReturn >= principal) {
+                // Profitable/Break-even scenario configuration logic
+                platformFeePct = 7.0;
+                badgeState.innerText = "Fee Engine Status: Profitable Matrix Active (7% + 2% + 0.5%)";
+                badgeState.className = "text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 w-max";
+            } else {
+                // Loss mitigation architecture activation logic
+                platformFeePct = 2.0;
+                badgeState.innerText = "Fee Engine Status: Downside Cushion Matrix Active (2% + 2% + 0.5%)";
+                badgeState.className = "text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg border bg-rose-500/10 text-rose-400 border-rose-500/20 w-max";
+            }
+
+            // Calculate fees directly relative to Gross Return Pipeline base
+            const fundFeeAmount = rawGrossReturn * (platformFeePct / 100);
+            const gstAmount = rawGrossReturn * (gstPct / 100);
+            const transactionFeeAmount = rawGrossReturn * (transactionFeePct / 100);
+
+            // Compute actual final dynamic distribution sum
+            const netSettlement = Math.max(0, rawGrossReturn - fundFeeAmount - gstAmount - transactionFeeAmount);
+
+            // ROI relative to historical entry value
+            let roi = 0;
+            if (principal > 0) {
+                roi = ((netSettlement - principal) / principal) * 100;
+            }
+
+            // UI Text Rewrite Interface Matrix Bindings
+            document.getElementById('calc-fund-fee').innerText = '₹' + fundFeeAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('calc-gst').innerText = '₹' + gstAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('calc-gate').innerText = '₹' + transactionFeeAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('calc-gross-yield').innerText = '₹' + rawGrossReturn.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            document.getElementById('calc-settlement').innerText = '₹' + netSettlement.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+            const roiEl = document.getElementById('calc-roi');
+            roiEl.innerText = (roi >= 0 ? '+' : '') + roi.toFixed(2) + '%';
+            if (roi >= 0) {
+                roiEl.className = "font-mono text-xl font-bold text-emerald-400";
+            } else {
+                roiEl.className = "font-mono text-xl font-bold text-rose-400";
+            }
+
+            // Performance Classification Tag Handling
+            const badge = document.getElementById('badge-classification');
+            if (multiplier < 1.0) {
+                badge.innerText = "Underperformed (Flop)";
+                badge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider";
+            } else if (multiplier < 1.1) {
+                badge.innerText = "Par Volatility (Average)";
+                badge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 uppercase tracking-wider";
+            } else if (multiplier < 2.5) {
+                badge.innerText = "High Yield (Hit)";
+                badge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider";
+            } else {
+                badge.innerText = "Alpha Allocation (Blockbuster)";
+                badge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider animate-pulse";
+            }
+
+            // Synchronize returns showing in the dynamic marketplace ledger
+            renderPortfolio();
+            updateTotalMetrics();
+        }
+    </script>
+</body>
+
+</html>
